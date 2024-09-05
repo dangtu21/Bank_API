@@ -16,10 +16,12 @@ const axios_1 = __importDefault(require("axios"));
 const express_1 = __importDefault(require("express"));
 const puppeteer_1 = __importDefault(require("puppeteer"));
 const app = (0, express_1.default)();
+console.log("1");
 const cors = require('cors');
 app.use(cors({
     origin: 'http://127.0.0.1:8000' // Cho phép nguồn gốc này truy cập API
 }));
+console.log("2");
 const port = 3000;
 let request_header;
 let request_url;
@@ -34,6 +36,7 @@ request_deviceIdCommon = "5utohm74-mbib-0000-0000-2024090411005560";
 request_cookie = 'BIGipServerk8s_online_banking_pool_9712=3424387338.61477.0000; MBAnalyticsaaaaaaaaaaaaaaaa_session_=LFBJLGHOJFJJFKCBCIEDNKGCIEPOAABJABHJMFIFCJIALGNHPLAEIHLGENOKCLEEDPGDGPNPLLPPDGMHDALAJKMBCNNJHMFKLCLIHDNKMFKIMHBLMJAFAMLEJKOMFDAO; _ga=GA1.3.1455413522.1725422454; _gid=GA1.3.227888054.1725422456; _gat_gtag_UA_205372863_2=1; JSESSIONID=22787B4E356588E995BCB59505D97986; BIGipServerk8s_KrakenD_Api_gateway_pool_10781=1696334090.7466.0000; MBAnalytics1727363067aaaaaaaaaaaaaaaa_cspm_=DACDIHHOBFJANGBBJHMAJIGCIELAMFPJKNMFCEJFDJIALGNHKBEEKPLGENILCLEEDPGCGPNPPBIJBKLBDALAJKMBAOAPNBIMPMOKJKLJMFKIMHNJMLFHKCMEJKOMFDAG; _ga_T1003L03HZ=GS1.1.1725422454.1.0.1725422468.0.0.0';
 request_url = "https://online.mbbank.com.vn/api/retail-transactionms/transactionms/get-account-transaction-history";
 app.use(express_1.default.json());
+console.log("3");
 app.get('/getTransaction', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield getInit_API(); // Chờ hàm getInit_API hoàn tất
@@ -69,12 +72,16 @@ app.get('/getTransaction', (req, res) => __awaiter(void 0, void 0, void 0, funct
         res.status(500).json({ error: 'Internal Server Error' });
     }
 }));
+console.log("4");
 function automateWebsite() {
     return __awaiter(this, void 0, void 0, function* () {
         const user_id = "0799721539";
         const password = "Tu211102!";
         let capcha;
-        const browser = yield puppeteer_1.default.launch({ headless: false });
+        const browser = yield puppeteer_1.default.launch({
+            executablePath: '/usr/bin/chromium-browser', // Đường dẫn đến Chromium
+            args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        });
         const page = yield browser.newPage();
         // Cài đặt chặn các yêu cầu mạng
         yield page.setRequestInterception(true);
@@ -210,6 +217,7 @@ function automateWebsite() {
         };
     });
 }
+console.log("5");
 // Tạo một hàm để đợi một khoảng thời gian
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 function checkUserIdInSessionStorage(page) {
@@ -276,6 +284,7 @@ function getDateRange() {
     const toDate = formatDate(today);
     return { fromDate, toDate };
 }
+console.log("6");
 // Khởi chạy server
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);

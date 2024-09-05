@@ -18,7 +18,7 @@ const puppeteer_1 = __importDefault(require("puppeteer"));
     const user_id = "0799721539";
     const password = "Tu211102!";
     let capcha;
-    const browser = yield puppeteer_1.default.launch({ headless: false });
+    const browser = yield puppeteer_1.default.launch({ headless: true });
     const page = yield browser.newPage();
     // Chặn các yêu cầu mạng để theo dõi và lấy dữ liệu từ API
     yield page.setRequestInterception(true);
