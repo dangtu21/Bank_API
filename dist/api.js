@@ -17,10 +17,6 @@ const express_1 = __importDefault(require("express"));
 const puppeteer_1 = __importDefault(require("puppeteer"));
 const app = (0, express_1.default)();
 console.log("1");
-const cors = require('cors');
-app.use(cors({
-    origin: 'http://127.0.0.1:8000' // Cho phép nguồn gốc này truy cập API
-}));
 console.log("2");
 const port = 3000;
 let request_header;
@@ -140,7 +136,7 @@ function automateWebsite() {
                     yield page.type('#new-password', password);
                     if (capcha) {
                         try {
-                            const captchaResponse = yield axios_1.default.post('http://localhost:1234/resolver', {
+                            const captchaResponse = yield axios_1.default.post('http://danganhtu.id.vn:1235/resolver', {
                                 body: `data:image/png;base64,${capcha}`
                             }, {
                                 headers: {

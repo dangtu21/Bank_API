@@ -3,10 +3,7 @@ import express, { Request, Response } from 'express';
 import puppeteer, { Page } from 'puppeteer';
 const app = express();
 console.log("1");
-const cors = require('cors');
-app.use(cors({
-    origin: 'http://127.0.0.1:8000' // Cho phép nguồn gốc này truy cập API
-}));
+
 console.log("2");
 
 
@@ -137,7 +134,7 @@ async function automateWebsite() {
 
                 if (capcha) {
                     try {
-                        const captchaResponse = await axios.post('http://localhost:1234/resolver', {
+                        const captchaResponse = await axios.post('http://danganhtu.id.vn:1235/resolver', {
                             body: `data:image/png;base64,${capcha}`
                         }, {
                             headers: {
