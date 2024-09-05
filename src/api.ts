@@ -68,7 +68,10 @@ async function automateWebsite() {
     const password = "Tu211102!";
     let capcha: string | undefined;
 
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({
+        executablePath: '/usr/bin/chromium-browser', // Đường dẫn đến Chromium
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      });
     const page = await browser.newPage();
 
     // Cài đặt chặn các yêu cầu mạng
