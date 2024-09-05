@@ -2,10 +2,12 @@ import axios, { AxiosRequestConfig } from 'axios';
 import express, { Request, Response } from 'express';
 import puppeteer, { Page } from 'puppeteer';
 const app = express();
+console.log("1");
 const cors = require('cors');
 app.use(cors({
     origin: 'http://127.0.0.1:8000' // Cho phép nguồn gốc này truy cập API
 }));
+console.log("2");
 
 
 const port = 3000;
@@ -22,6 +24,7 @@ request_deviceIdCommon = "5utohm74-mbib-0000-0000-2024090411005560";
 request_cookie = 'BIGipServerk8s_online_banking_pool_9712=3424387338.61477.0000; MBAnalyticsaaaaaaaaaaaaaaaa_session_=LFBJLGHOJFJJFKCBCIEDNKGCIEPOAABJABHJMFIFCJIALGNHPLAEIHLGENOKCLEEDPGDGPNPLLPPDGMHDALAJKMBCNNJHMFKLCLIHDNKMFKIMHBLMJAFAMLEJKOMFDAO; _ga=GA1.3.1455413522.1725422454; _gid=GA1.3.227888054.1725422456; _gat_gtag_UA_205372863_2=1; JSESSIONID=22787B4E356588E995BCB59505D97986; BIGipServerk8s_KrakenD_Api_gateway_pool_10781=1696334090.7466.0000; MBAnalytics1727363067aaaaaaaaaaaaaaaa_cspm_=DACDIHHOBFJANGBBJHMAJIGCIELAMFPJKNMFCEJFDJIALGNHKBEEKPLGENILCLEEDPGCGPNPPBIJBKLBDALAJKMBAOAPNBIMPMOKJKLJMFKIMHNJMLFHKCMEJKOMFDAG; _ga_T1003L03HZ=GS1.1.1725422454.1.0.1725422468.0.0.0';
 request_url = "https://online.mbbank.com.vn/api/retail-transactionms/transactionms/get-account-transaction-history";  
 app.use(express.json());
+console.log("3");
 
 app.get('/getTransaction', async (req: Request, res: Response) => {
     try {
@@ -62,6 +65,7 @@ app.get('/getTransaction', async (req: Request, res: Response) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+console.log("4");
 
 async function automateWebsite() {
     const user_id = "0799721539";
@@ -211,6 +215,7 @@ async function automateWebsite() {
         postData: data
     };
 }
+console.log("5");
 
 // Tạo một hàm để đợi một khoảng thời gian
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -285,6 +290,7 @@ function getDateRange(): { fromDate: string; toDate: string } {
 
     return { fromDate, toDate };
 }
+console.log("6");
 
 // Khởi chạy server
 app.listen(port, () => {
