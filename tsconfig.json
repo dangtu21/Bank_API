@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "ES6",                  // Phiên bản ECMAScript mà bạn muốn biên dịch đến
+    "module": "commonjs",             // Loại module code được tạo ra
+    "outDir": "./dist",               // Thư mục để lưu trữ mã JavaScript đã biên dịch
+    "rootDir": "./src",               // Thư mục chứa mã nguồn TypeScript
+    "strict": true,                   // Kích hoạt tất cả các tùy chọn kiểm tra kiểu nghiêm ngặt
+    "esModuleInterop": true,          // Cho phép nhập khẩu các module CommonJS
+    "skipLibCheck": true,             // Bỏ qua kiểm tra kiểu trong các file định nghĩa thư viện
+    "forceConsistentCasingInFileNames": true  // Đảm bảo tên file có kiểu nhất quán
+  },
+  "include": ["src/**/*"]            // Bao gồm tất cả các file TypeScript trong thư mục src
+}
