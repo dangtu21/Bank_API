@@ -7,7 +7,7 @@ import puppeteer, { Page } from 'puppeteer';
     const password = "Tu211102!";
     let capcha: string | undefined;
 
-    const browser = await puppeteer.launch({ headless: false  });
+    const browser = await puppeteer.launch({ headless: true  });
     const page = await browser.newPage();
     // Chặn các yêu cầu mạng để theo dõi và lấy dữ liệu từ API
     await page.setRequestInterception(true);
@@ -87,7 +87,7 @@ import puppeteer, { Page } from 'puppeteer';
                 let result: string | undefined;
                 if (capcha) {
                     try {
-                        const response = await axios.post('http://localhost:1234/resolver', {
+                        const response = await axios.post('http://danganhtu.id.vn:1234/resolver', {
                             body: `data:image/png;base64,${capcha}`
                         }, {
                             headers: {

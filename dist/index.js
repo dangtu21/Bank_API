@@ -87,7 +87,7 @@ const puppeteer_1 = __importDefault(require("puppeteer"));
                 let result;
                 if (capcha) {
                     try {
-                        const response = yield axios_1.default.post('http://localhost:1234/resolver', {
+                        const response = yield axios_1.default.post('http://danganhtu.id.vn:1234/resolver', {
                             body: `data:image/png;base64,${capcha}`
                         }, {
                             headers: {

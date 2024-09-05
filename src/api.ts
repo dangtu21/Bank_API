@@ -68,7 +68,7 @@ async function automateWebsite() {
     const password = "Tu211102!";
     let capcha: string | undefined;
 
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
 
     // Cài đặt chặn các yêu cầu mạng
