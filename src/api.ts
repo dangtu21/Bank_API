@@ -1,7 +1,12 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import express, { Request, Response } from 'express';
 import puppeteer, { Page } from 'puppeteer';
+const cors = require('cors');
 const app = express();
+// Cấu hình CORS cho phép tất cả các nguồn
+app.use(cors({
+    origin: '*' // Cho phép tất cả các nguồn
+}));
 console.log("1");
 
 console.log("2");
