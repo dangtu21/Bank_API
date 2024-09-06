@@ -278,19 +278,24 @@ async function getInit_API() {
     };
 }
 
-function formatDate(date: Date, timezone: string = 'UTC'): string {
-    const formattedDate = moment(date).tz(timezone).format('DD/MM/YYYY');
-    return formattedDate;
+function formatDate(date: Date): string {
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
 }
 
-function getDateRange(timezone: string = 'UTC'): { fromDate: string; toDate: string } {
-    const today = moment().tz(timezone).toDate(); // Lấy ngày hôm nay với múi giờ
-    const twoDaysAgo = moment().tz(timezone).subtract(2, 'days').toDate(); // Lấy ngày cách đây 2 ngày với múi giờ
+function getDateRange(): { fromDate: string; toDate: string } {
+    const today = new Date();
+    const twoDaysAgo = new Date(today);
+    twoDaysAgo.setDate(today.getDate() - 2);
 
-    const fromDate = formatDate(twoDaysAgo, timezone);
-    const toDate = formatDate(today, timezone);
-    process.env.TZ = 'Asia/Ho_Chi_Minh';
-    console.log('Current Date:', new Date());
+    // Sử dụng toLocaleString để điều chỉnh theo múi giờ 'Asia/Ho_Chi_Minh'
+    const localToday = new Date(today.toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' }));
+    const localTwoDaysAgo = new Date(twoDaysAgo.toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' }));
+
+    const fromDate = formatDate(localTwoDaysAgo);
+    const toDate = formatDate(localToday);
 
     return { fromDate, toDate };
 }
