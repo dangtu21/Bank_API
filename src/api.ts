@@ -289,6 +289,7 @@ function getDateRange(timezone: string = 'UTC'): { fromDate: string; toDate: str
 
     const fromDate = formatDate(twoDaysAgo, timezone);
     const toDate = formatDate(today, timezone);
+    console.log('Current Date:', new Date());
 
     return { fromDate, toDate };
 }
