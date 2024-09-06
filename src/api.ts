@@ -27,7 +27,7 @@ request_cookie = 'BIGipServerk8s_online_banking_pool_9712=3424387338.61477.0000;
 request_url = "https://online.mbbank.com.vn/api/retail-transactionms/transactionms/get-account-transaction-history";  
 app.use(express.json());
 console.log("3");
-
+let automateWebsitePromise: Promise<{ request_header: AxiosRequestConfig<any>, postData: any }> | undefined;
 app.get('/getTransaction', async (req: Request, res: Response) => {
     try {
         await getInit_API(); // Chờ hàm getInit_API hoàn tất
@@ -38,8 +38,10 @@ app.get('/getTransaction', async (req: Request, res: Response) => {
             
             if (!result.ok && result.message === "Session Invalid") {
                 console.log('Session Invalid. Retrying...');
-                // Cập nhật session_id và các thông tin khác
-                const sessionData = await automateWebsite();
+                if (!automateWebsitePromise) {
+                    automateWebsitePromise = automateWebsite();
+                }
+                const sessionData = await automateWebsitePromise;
                 // Cập nhật request_header với sessionData nếu cần
                 console.log('Session Data:', sessionData);
                 
