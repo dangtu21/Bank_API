@@ -1,5 +1,6 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import express, { Request, Response } from 'express';
+import moment from 'moment-timezone';
 import puppeteer, { Page } from 'puppeteer';
 const cors = require('cors');
 const app = express();
@@ -10,7 +11,7 @@ app.use(cors({
 console.log("1");
 
 console.log("2");
-
+const timezone = 'Asia/Ho_Chi_Minh'; 
 
 const port = 3000;
 let request_header: AxiosRequestConfig<any> | undefined;
@@ -277,20 +278,17 @@ async function getInit_API() {
     };
 }
 
-function formatDate(date: Date): string {
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
+function formatDate(date: Date, timezone: string = 'UTC'): string {
+    const formattedDate = moment(date).tz(timezone).format('DD/MM/YYYY');
+    return formattedDate;
 }
 
-function getDateRange(): { fromDate: string; toDate: string } {
-    const today = new Date();
-    const twoDaysAgo = new Date(today);
-    twoDaysAgo.setDate(today.getDate() - 2);
+function getDateRange(timezone: string = 'UTC'): { fromDate: string; toDate: string } {
+    const today = moment().tz(timezone).toDate(); // Lấy ngày hôm nay với múi giờ
+    const twoDaysAgo = moment().tz(timezone).subtract(2, 'days').toDate(); // Lấy ngày cách đây 2 ngày với múi giờ
 
-    const fromDate = formatDate(twoDaysAgo);
-    const toDate = formatDate(today);
+    const fromDate = formatDate(twoDaysAgo, timezone);
+    const toDate = formatDate(today, timezone);
 
     return { fromDate, toDate };
 }
