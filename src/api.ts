@@ -30,6 +30,24 @@ request_url = "https://online.mbbank.com.vn/api/retail-transactionms/transaction
 app.use(express.json());
 console.log("3");
 let automateWebsitePromise: Promise<{ request_header: AxiosRequestConfig<any>, postData: any }> | undefined;
+async function gettransactionHistoryList(){
+    if (!automateWebsitePromise) {
+        automateWebsitePromise = automateWebsite();
+    }
+    const sessionData = await automateWebsitePromise;
+    console.log('Session Data:', sessionData);
+
+    // Cập nhật các biến sessionId và deviceIdCommon nếu có giá trị mới
+    request_sessionId = sessionData.postData.sessionId || request_sessionId;
+    request_deviceIdCommon = sessionData.postData.deviceIdCommon || request_deviceIdCommon;
+
+    await getInit_API();
+
+    const response = await axios.post(request_url, postData, request_header);
+    const { result, transactionHistoryList } = response.data;
+    isResponseSent = true;
+    return transactionHistoryList;
+}
 app.get('/getTransaction', async (req: Request, res: Response) => {
     // Chờ hàm getInit_API hoàn tất
     await getInit_API();
@@ -45,27 +63,8 @@ app.get('/getTransaction', async (req: Request, res: Response) => {
             console.log('Session Invalid. Retrying...');
             console.log("33");
     
-            if (!automateWebsitePromise) {
-                automateWebsitePromise = automateWebsite();
-            }
-            const sessionData = await automateWebsitePromise;
-            console.log('Session Data:', sessionData);
-    
-            // Cập nhật các biến sessionId và deviceIdCommon nếu có giá trị mới
-            request_sessionId = sessionData.postData.sessionId || request_sessionId;
-            request_deviceIdCommon = sessionData.postData.deviceIdCommon || request_deviceIdCommon;
-    
-            await getInit_API();
-    
-            // Thực hiện lại gọi API với các header và postData đã cập nhật
-            console.log('Request URL:', request_url);
-            console.log('Request Headers:', request_header);
-            console.log('Request Post Data:', postData);
-    
-            response = await axios.post(request_url, postData, request_header);
-            ({ result, transactionHistoryList } = response.data);
-            console.log("responsexxx123 :", response.data);
-            console.log('Transaction History List1:', transactionHistoryList);
+            console.log('Session Invalid. Retrying...');
+            let transactionHistoryList= await gettransactionHistoryList();
     
             if (!isResponseSent) {
                 res.json(transactionHistoryList);
@@ -87,29 +86,13 @@ app.get('/getTransaction', async (req: Request, res: Response) => {
         try {
             if (!isResponseSent) {
                 console.log('Session Invalid. Retrying...');
-                if (!automateWebsitePromise) {
-                    automateWebsitePromise = automateWebsite();
+                let transactionHistoryList= await gettransactionHistoryList();
+                // Nếu không có lỗi, trả về danh sách lịch sử giao dịch
+                if (!isResponseSent) {
+                    res.json(transactionHistoryList);
+                    isResponseSent = true;
                 }
-                const sessionData = await automateWebsitePromise;
-                console.log('Session Data:', sessionData);
-        
-                // Cập nhật các biến sessionId và deviceIdCommon nếu có giá trị mới
-                request_sessionId = sessionData.postData.sessionId || request_sessionId;
-                request_deviceIdCommon = sessionData.postData.deviceIdCommon || request_deviceIdCommon;
-        
-                await getInit_API();
-        
-                // Thực hiện lại gọi API với các header và postData đã cập nhật
-                console.log('Request URL:', request_url);
-                console.log('Request Headers:', request_header);
-                console.log('Request Post Data:', postData);
-        
-                const response = await axios.post(request_url, postData, request_header);
-                const { result, transactionHistoryList } = response.data;
-                console.log("responsexxxresponsexxx :", response.data);
-                console.log('Transaction History List1:', transactionHistoryList);
-                res.json(transactionHistoryList);
-                isResponseSent = true;
+                
             }
     
         } catch (error) {
@@ -144,7 +127,8 @@ async function automateWebsite() {
     const getBalanceLoyaltyPromise = new Promise<{ sessionId?: string; refNo?: string; deviceIdCommon?: string }>((resolve) => {
         resolveRequestData = resolve;
     });
-
+console.log("66");
+    
     page.on('request', async (request) => {
         if (request.url() === 'https://online.mbbank.com.vn/api/retail_web/loyalty/getBalanceLoyalty') {
             console.log('Request URL:', request.url());
