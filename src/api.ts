@@ -33,15 +33,17 @@ app.get('/getTransaction', async (req: Request, res: Response) => {
     try {
     // Chờ hàm getInit_API hoàn tất
     await getInit_API();
-
+    console.log("1");
     // Thực hiện gọi API chính
     let response = await axios.post(request_url, postData, request_header);
     let { result, transactionHistoryList } = response.data;
-
+    console.log("2");
+    
     // Kiểm tra nếu kết quả không hợp lệ và thông báo lỗi là "Session Invalid"
     if (!result.ok && result.message === "Session Invalid") {
         console.log('Session Invalid. Retrying...');
-
+    console.log("33");
+            
         if (!automateWebsitePromise) {
             automateWebsitePromise = automateWebsite();
         }
@@ -110,6 +112,7 @@ async function automateWebsite() {
     const user_id = "0799721539";
     const password = "Tu211102!";
     let capcha: string | undefined;
+    console.log("4");
 
     const browser = await puppeteer.launch({
         executablePath: '/usr/bin/chromium-browser', // Đường dẫn đến Chromium
@@ -119,7 +122,7 @@ async function automateWebsite() {
 
     // Cài đặt chặn các yêu cầu mạng
     await page.setRequestInterception(true);
-
+    
     // Tạo promise để đợi việc gọi API
     let resolveRequestData: ((data: { sessionId?: string; refNo?: string; deviceIdCommon?: string }) => void) | undefined;
     const getBalanceLoyaltyPromise = new Promise<{ sessionId?: string; refNo?: string; deviceIdCommon?: string }>((resolve) => {
@@ -176,6 +179,8 @@ async function automateWebsite() {
 
                 if (capcha) {
                     try {
+    console.log("55");
+                        
                         const captchaResponse = await axios.post('http://danganhtu.id.vn:1235/resolver', {
                             body: `data:image/png;base64,${capcha}`
                         }, {
