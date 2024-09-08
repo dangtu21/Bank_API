@@ -64,9 +64,10 @@ app.get('/getTransaction', async (req: Request, res: Response) => {
         console.log('Request Post Data:', postData);
 
         response = await axios.post(request_url, postData, request_header);
-        ({ result, transactionHistoryList } = response.data);
-        console.log("responsexxxresponsexxx :", response.data);
+        { result, transactionHistoryList } = response.data;
+        console.log("responsexxx123 :", response.data);
         console.log('Transaction History List1:', transactionHistoryList);
+        res.json(transactionHistoryList);
     }
 
     // Nếu không có lỗi, trả về danh sách lịch sử giao dịch
