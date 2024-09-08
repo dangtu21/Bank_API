@@ -31,10 +31,11 @@ app.use(express.json());
 console.log("3");
 let automateWebsitePromise: Promise<{ request_header: AxiosRequestConfig<any>, postData: any }> | undefined;
 app.get('/getTransaction', async (req: Request, res: Response) => {
-    try {
     // Chờ hàm getInit_API hoàn tất
     await getInit_API();
     console.log("1");
+    try {
+    
     // Thực hiện gọi API chính
     let response = await axios.post(request_url, postData, request_header);
     let { result, transactionHistoryList } = response.data;
@@ -314,7 +315,7 @@ async function getInit_API() {
             'cookie': request_cookie,
             'origin': 'https://online.mbbank.com.vn'
         },
-        timeout: 50005000
+        timeout: 5000
     };
     
     
