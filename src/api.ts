@@ -130,7 +130,10 @@ async function automateWebsite() {
     let capcha: string | undefined;
     console.log("4");
 
-    const browser = await puppeteer.launch({ headless: true  });
+    const browser = await puppeteer.launch({
+        executablePath: '/usr/bin/chromium-browser', // Đường dẫn đến Chromium
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      });
     const page = await browser.newPage();
 
     // Cài đặt chặn các yêu cầu mạng
