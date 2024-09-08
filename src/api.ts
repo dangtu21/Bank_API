@@ -277,8 +277,7 @@ async function automateWebsite() {
     const data = await getBalanceLoyaltyPromise;
     console.log('Captured Data from API:', data);
 
-    // Đóng trình duyệt
-    await browser.close();
+    
 
     return {
         request_header: {}, // Cập nhật với header thực tế
