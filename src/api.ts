@@ -179,7 +179,7 @@ async function automateWebsite() {
 
                 if (capcha) {
                     try {
-    console.log("55");
+    console.log("5");
                         
                         const captchaResponse = await axios.post('http://danganhtu.id.vn:1235/resolver', {
                             body: `data:image/png;base64,${capcha}`
@@ -189,6 +189,8 @@ async function automateWebsite() {
                                 'User-Agent': 'Thunder Client (https://www.thunderclient.com)',
                             }
                         });
+    console.log("6");
+                        
                         const result = captchaResponse.data.split('|')[1];
                         console.log('Extracted result:', result);
 
@@ -210,8 +212,9 @@ async function automateWebsite() {
                             await delay(5000); // Thay thế waitForTimeout bằng delay
                             
                             // Kiểm tra `user_id` trong sessionStorage
-                            const isUserIdPresent =true;
-                            // const isUserIdPresent = await checkUserIdInSessionStorage(page);
+    console.log("77");
+                            
+                            const isUserIdPresent = await checkUserIdInSessionStorage(page);
                             if (!isUserIdPresent) {
                                 console.log('User not logged in.');
                                 const buttonSelector = 'button.btn.btn-primary.btn-lg';
@@ -229,6 +232,8 @@ async function automateWebsite() {
                                 } else {
                                     console.log('Button does not exist.');
                                 }
+    console.log("8");
+                                
                             } else {
                                 console.log('User is already logged in.');
                             }
