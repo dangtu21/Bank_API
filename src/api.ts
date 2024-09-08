@@ -31,44 +31,78 @@ console.log("3");
 let automateWebsitePromise: Promise<{ request_header: AxiosRequestConfig<any>, postData: any }> | undefined;
 app.get('/getTransaction', async (req: Request, res: Response) => {
     try {
-        await getInit_API(); // Chờ hàm getInit_API hoàn tất
+    // Chờ hàm getInit_API hoàn tất
+    await getInit_API();
 
-        
-            const response = await axios.post(request_url, postData, request_header);
-            const { result, transactionHistoryList } = response.data;
-            
-            if (!result.ok && result.message === "Session Invalid") {
-                console.log('Session Invalid. Retrying...');
-                if (!automateWebsitePromise) {
-                    automateWebsitePromise = automateWebsite();
-                }
-                const sessionData = await automateWebsitePromise;
-                // Cập nhật request_header với sessionData nếu cần
-                console.log('Session Data:', sessionData);
-                
-                let tmp_sessionId=request_sessionId;
-                let tmp_deviceIdCommon=request_deviceIdCommon;
-                request_sessionId=sessionData.postData.sessionId||tmp_sessionId;
-                request_deviceIdCommon=sessionData.postData.deviceIdCommon||tmp_deviceIdCommon;
-                await getInit_API();
-                console.log('Request URL:', request_url);
-                console.log('Request Headers:', request_header);
-                console.log('Request Post Data:', postData);
-                const response1 = await axios.post(request_url, postData, request_header);
-                const { result, transactionHistoryList } = response1.data;
-                console.log("response :" ,response1.data);
-                console.log('Transaction History List1:', transactionHistoryList);
-                res.json(transactionHistoryList);
-            }else{
-                console.log('Transaction History List:', transactionHistoryList);
-                res.json(transactionHistoryList);
-            }
+    // Thực hiện gọi API chính
+    let response = await axios.post(request_url, postData, request_header);
+    let { result, transactionHistoryList } = response.data;
 
+    // Kiểm tra nếu kết quả không hợp lệ và thông báo lỗi là "Session Invalid"
+    if (!result.ok && result.message === "Session Invalid") {
+        console.log('Session Invalid. Retrying...');
+
+        if (!automateWebsitePromise) {
+            automateWebsitePromise = automateWebsite();
+        }
+        const sessionData = await automateWebsitePromise;
+        console.log('Session Data:', sessionData);
+
+        // Cập nhật các biến sessionId và deviceIdCommon nếu có giá trị mới
+        request_sessionId = sessionData.postData.sessionId || request_sessionId;
+        request_deviceIdCommon = sessionData.postData.deviceIdCommon || request_deviceIdCommon;
+
+        await getInit_API();
+
+        // Thực hiện lại gọi API với các header và postData đã cập nhật
+        console.log('Request URL:', request_url);
+        console.log('Request Headers:', request_header);
+        console.log('Request Post Data:', postData);
+
+        response = await axios.post(request_url, postData, request_header);
+        ({ result, transactionHistoryList } = response.data);
+        console.log("response :", response.data);
+        console.log('Transaction History List1:', transactionHistoryList);
+    }
+
+    // Nếu không có lỗi, trả về danh sách lịch sử giao dịch
+    res.json(transactionHistoryList);
+
+} catch (error) {
+    // Xử lý lỗi khi gọi API và cố gắng khôi phục
+    console.error('Error calling API:', error);
+
+    try {
+        console.log('Session Invalid. Retrying...');
+        if (!automateWebsitePromise) {
+            automateWebsitePromise = automateWebsite();
+        }
+        const sessionData = await automateWebsitePromise;
+        console.log('Session Data:', sessionData);
+
+        // Cập nhật các biến sessionId và deviceIdCommon nếu có giá trị mới
+        request_sessionId = sessionData.postData.sessionId || request_sessionId;
+        request_deviceIdCommon = sessionData.postData.deviceIdCommon || request_deviceIdCommon;
+
+        await getInit_API();
+
+        // Thực hiện lại gọi API với các header và postData đã cập nhật
+        console.log('Request URL:', request_url);
+        console.log('Request Headers:', request_header);
+        console.log('Request Post Data:', postData);
+
+        const response = await axios.post(request_url, postData, request_header);
+        const { result, transactionHistoryList } = response.data;
+        console.log("response :", response.data);
+        console.log('Transaction History List1:', transactionHistoryList);
+        res.json(transactionHistoryList);
         
     } catch (error) {
-        console.error('Error calling API:', error);
+        console.error('Error calling API during retry:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
+}
+
 });
 console.log("4");
 
