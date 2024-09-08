@@ -1,6 +1,7 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import express, { Request, Response } from 'express';
 
+
 import puppeteer, { Page } from 'puppeteer';
 const cors = require('cors');
 const app = express();
@@ -30,6 +31,7 @@ request_url = "https://online.mbbank.com.vn/api/retail-transactionms/transaction
 app.use(express.json());
 console.log("3");
 let automateWebsitePromise: Promise<{ request_header: AxiosRequestConfig<any>, postData: any }> | undefined;
+let getCapcha: Promise<{ request_header: AxiosRequestConfig<any>, postData: any }> | undefined;
 async function gettransactionHistoryList(){
     if (!automateWebsitePromise) {
         automateWebsitePromise = automateWebsite();
@@ -40,13 +42,20 @@ async function gettransactionHistoryList(){
     // Cập nhật các biến sessionId và deviceIdCommon nếu có giá trị mới
     request_sessionId = sessionData.postData.sessionId || request_sessionId;
     request_deviceIdCommon = sessionData.postData.deviceIdCommon || request_deviceIdCommon;
+    console.log('request_sessionId:', request_sessionId);
+    console.log('request_deviceIdCommon:', request_deviceIdCommon);
 
     await getInit_API();
-
-    const response = await axios.post(request_url, postData, request_header);
-    const { result, transactionHistoryList } = response.data;
-    isResponseSent = true;
-    return transactionHistoryList;
+    try{
+        const response = await axios.post(request_url, postData, request_header);
+        const { result, transactionHistoryList } = response.data;
+        isResponseSent = true;
+        return transactionHistoryList;
+    }catch(err){
+        console.error("Lỗi :",err);
+        return null;
+    }
+    
 }
 app.get('/getTransaction', async (req: Request, res: Response) => {
     // Chờ hàm getInit_API hoàn tất
@@ -62,14 +71,25 @@ app.get('/getTransaction', async (req: Request, res: Response) => {
         if (!result.ok && result.message === "Session Invalid") {
             console.log('Session Invalid. Retrying...');
             console.log("33");
-    
-            console.log('Session Invalid. Retrying...');
             let transactionHistoryList= await gettransactionHistoryList();
-    
-            if (!isResponseSent) {
+            console.log(transactionHistoryList);
+            if(transactionHistoryList===null){
+                
+                console.log("transactionHistoryList");
+                res.json({status:"lỗi"});
+                isResponseSent = true;
+                return; 
+            }else
+            if (isResponseSent==false) {
+                console.log(" chưa trả về  ");
+
                 res.json(transactionHistoryList);
                 isResponseSent = true;
                 return; // Ngăn không cho gửi phản hồi thêm lần nữa
+            }else{
+                console.log("không rõ ");
+                res.json(transactionHistoryList);
+                isResponseSent = true;
             }
         }
     
@@ -85,10 +105,24 @@ app.get('/getTransaction', async (req: Request, res: Response) => {
     
         try {
             if (!isResponseSent) {
-                console.log('Session Invalid. Retrying...');
+                console.log('2Session Invalid. Retrying...');
                 let transactionHistoryList= await gettransactionHistoryList();
                 // Nếu không có lỗi, trả về danh sách lịch sử giao dịch
-                if (!isResponseSent) {
+                if(transactionHistoryList===null){
+                
+                    console.log("transactionHistoryList");
+                    res.json({status:"lỗi"});
+                    isResponseSent = true;
+                    return; 
+                }else
+                if (isResponseSent==false) {
+                    console.log(" chưa trả về  ");
+    
+                    res.json(transactionHistoryList);
+                    isResponseSent = true;
+                    return; // Ngăn không cho gửi phản hồi thêm lần nữa
+                }else{
+                    console.log("không rõ ");
                     res.json(transactionHistoryList);
                     isResponseSent = true;
                 }
@@ -127,15 +161,15 @@ async function automateWebsite() {
     const getBalanceLoyaltyPromise = new Promise<{ sessionId?: string; refNo?: string; deviceIdCommon?: string }>((resolve) => {
         resolveRequestData = resolve;
     });
-console.log("66");
-    
+
+    console.log("66");
+
     page.on('request', async (request) => {
         if (request.url() === 'https://online.mbbank.com.vn/api/retail_web/loyalty/getBalanceLoyalty') {
             console.log('Request URL:', request.url());
             console.log('Request Method:', request.method());
             console.log('Request Headers:', request.headers());
             console.log('Request Post Data:', request.postData());
-            login=true;
             const requestDetails_postData = request.postData() || "";
             let request_data: { sessionId?: string; refNo?: string; deviceIdCommon?: string } = {};
             if (requestDetails_postData) {
@@ -160,95 +194,12 @@ console.log("66");
         if (url.includes('/api/retail-web-internetbankingms/getCaptchaImage')) {
             try {
                 const responseBody = await response.json();
-                capcha = responseBody.imageString;
-                await page.waitForSelector('#user-id');
-                await page.evaluate(() => {
-                    const input = document.querySelector('#user-id') as HTMLInputElement;
-                    if (input) {
-                        input.value = ''; // Xóa văn bản hiện tại
-                    }
-                });
-                await page.type('#user-id', user_id);
-                await page.waitForSelector('#new-password');
-                await page.evaluate(() => {
-                    const input = document.querySelector('#new-password') as HTMLInputElement;
-                    if (input) {
-                        input.value = ''; // Xóa văn bản hiện tại
-                    }
-                });
-                await page.type('#new-password', password);
-
+                capcha = responseBody.imageString || undefined;
                 if (capcha) {
-                    try {
-    console.log("5");
-                        
-                        const captchaResponse = await axios.post('http://danganhtu.id.vn:1235/resolver', {
-                            body: `data:image/png;base64,${capcha}`
-                        }, {
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'User-Agent': 'Thunder Client (https://www.thunderclient.com)',
-                            }
-                        });
-    console.log("6");
-                        
-                        const result = captchaResponse.data.split('|')[1];
-                        console.log('Extracted result:', result);
-
-                        await page.waitForSelector('input[type="text"].w-100.pl-upper');
-                        if (result) {
-                            await page.type('input[type="text"].w-100.pl-upper', result);
-                            await page.waitForSelector('#login-btn');
-                            const isVisible = await page.evaluate(() => {
-                                const button = document.querySelector('#login-btn');
-                                return button && window.getComputedStyle(button).display !== 'none' && !button.hasAttribute('disabled');
-                            });
-                            if (isVisible) {
-                                await page.click('#login-btn');
-                                await page.click('#login-btn');
-                                console.log('Button clicked successfully.');
-                            } else {
-                                console.log('Button is not visible or not interactable.');
-                            }
-                            await delay(5000); // Thay thế waitForTimeout bằng delay
-                            
-                            // Kiểm tra `user_id` trong sessionStorage
-    console.log("77");
-                            if(login===false){
-                            const isUserIdPresent = await checkUserIdInSessionStorage(page);
-                            if (!isUserIdPresent) {
-                                console.log('User not logged in.');
-                                const buttonSelector = 'button.btn.btn-primary.btn-lg';
-                                const buttonExists = await page.evaluate((selector) => {
-                                    const button = document.querySelector(selector);
-                                    return button !== null;
-                                }, buttonSelector);
-
-                                if (buttonExists) {
-                                    console.log('Button exists. Clicking on the button...');
-                                    await page.click(buttonSelector);
-                                    console.log('Button clicked.');
-                                    await page.waitForSelector('#refresh-captcha');
-                                    await page.click('#refresh-captcha');
-                                } else {
-                                    await page.waitForSelector('#refresh-captcha');
-                                    await page.click('#refresh-captcha');
-                                    console.log('Button does not exist.');
-                                }
-    console.log("8");
-                            }
-                            } else {
-                                console.log('User is already logged in.');
-                            }
-                                
-                        }
-                    } catch (error) {
-                        console.error('Error processing CAPTCHA:', error);
-                    }
+                    await LogIn(page, capcha, user_id, password);
                 } else {
                     console.error('CAPTCHA was not captured.');
                 }
-                
             } catch (error) {
                 console.error('Error parsing CAPTCHA response:', error);
             }
@@ -261,7 +212,6 @@ console.log("66");
     const data = await getBalanceLoyaltyPromise;
     console.log('Captured Data from API:', data);
 
-    
     // Đóng trình duyệt
     await browser.close();
     return {
@@ -269,11 +219,112 @@ console.log("66");
         postData: data
     };
 }
+
 console.log("5");
 
 // Tạo một hàm để đợi một khoảng thời gian
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
+async function getCapCha(capcha:string): Promise<any>{
+    try {
+        console.log("5");
+        
+        const captchaResponse = await axios.post('http://danganhtu.id.vn:1235/resolver', {
+            body: `data:image/png;base64,${capcha}`
+        }, {
+            headers: {
+                'Content-Type': 'application/json',
+                'User-Agent': 'Thunder Client (https://www.thunderclient.com)',
+            }
+        });
+        return captchaResponse;
+        
+    } catch (error) {
+        console.error('Error processing CAPTCHA:', error);
+        return null;
+    }
+}
+async function LogIn(page: Page, capcha: string, user_id: string, password: string): Promise<boolean> {
+    try {
+        await page.waitForSelector('#user-id');
+        await page.evaluate(() => {
+            const input = document.querySelector('#user-id') as HTMLInputElement;
+            if (input) {
+                input.value = ''; // Xóa văn bản hiện tại
+            }
+        });
+        await page.type('#user-id', user_id);
+
+        await page.waitForSelector('#new-password');
+        await page.evaluate(() => {
+            const input = document.querySelector('#new-password') as HTMLInputElement;
+            if (input) {
+                input.value = ''; // Xóa văn bản hiện tại
+            }
+        });
+        await page.type('#new-password', password);
+
+        const captchaResponse = await getCapCha(capcha);
+        if (captchaResponse === null) {
+            return false;
+        }
+
+        console.log("6");
+        if (captchaResponse != null) {
+            const result = captchaResponse.data.split('|')[1];
+            console.log('Extracted result:', result);
+
+            await page.waitForSelector('input[type="text"].w-100.pl-upper');
+            if (result) {
+                await page.type('input[type="text"].w-100.pl-upper', result);
+                await page.waitForSelector('#login-btn');
+
+                const isVisible = await page.evaluate(() => {
+                    const button = document.querySelector('#login-btn');
+                    return button && window.getComputedStyle(button).display !== 'none' && !button.hasAttribute('disabled');
+                });
+
+                if (isVisible) {
+                    await page.click('#login-btn');
+                    delay(5000); // Thay thế delay bằng waitForTimeout
+                    console.log('Button clicked successfully.');
+                } else {
+                    console.log('Button is not visible or not interactable.');
+                    return false;
+                }
+
+                // Kiểm tra `user_id` trong sessionStorage
+                console.log("77");
+                if (!await checkUserIdInSessionStorage(page)) {
+                    console.log('User not logged in.');
+                    const buttonSelector = 'button.btn.btn-primary.btn-lg';
+                    const buttonExists = await page.evaluate((selector) => {
+                        const button = document.querySelector(selector);
+                        return button !== null;
+                    }, buttonSelector);
+
+                    if (buttonExists) {
+                        console.log('Button exists. Clicking on the button...');
+                        await page.click(buttonSelector);
+                        console.log('Button clicked.');
+                    }
+                    await page.waitForSelector('#refresh-captcha');
+                    await page.click('#refresh-captcha');
+                    console.log('Refreshing CAPTCHA.');
+                    return false;
+                } else {
+                    console.log('User is already logged in.');
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    } catch (error) {
+        console.error('Error during login:', error);
+        return false;
+    }
+}
 
 async function checkUserIdInSessionStorage(page: Page): Promise<boolean> {
     try {
@@ -313,7 +364,7 @@ async function getInit_API() {
             'cookie': request_cookie,
             'origin': 'https://online.mbbank.com.vn'
         },
-        timeout: 30000
+        timeout: 5000
     };
     
     
