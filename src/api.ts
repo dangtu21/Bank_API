@@ -363,8 +363,7 @@ async function getInit_API() {
             'sec-ch-ua-platform': '"Windows"',
             'cookie': request_cookie,
             'origin': 'https://online.mbbank.com.vn'
-        },
-        timeout: 5000
+        }
     };
     
     
