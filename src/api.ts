@@ -21,6 +21,7 @@ let request_refNo: string;
 let request_deviceIdCommon: string;
 let request_cookie: string;
 let postData: any;
+let login=false;
 request_sessionId = "66e1cf0d-44a6-47be-9a21-f3fe100677a4";
 request_refNo = "0799721539-2024090411010830-29297";
 request_deviceIdCommon = "5utohm74-mbib-0000-0000-2024090411005560";
@@ -63,7 +64,7 @@ app.get('/getTransaction', async (req: Request, res: Response) => {
 
         response = await axios.post(request_url, postData, request_header);
         ({ result, transactionHistoryList } = response.data);
-        console.log("response :", response.data);
+        console.log("responsexxxresponsexxx :", response.data);
         console.log('Transaction History List1:', transactionHistoryList);
     }
 
@@ -95,7 +96,7 @@ app.get('/getTransaction', async (req: Request, res: Response) => {
 
         const response = await axios.post(request_url, postData, request_header);
         const { result, transactionHistoryList } = response.data;
-        console.log("response :", response.data);
+        console.log("responsexxxresponsexxx :", response.data);
         console.log('Transaction History List1:', transactionHistoryList);
         res.json(transactionHistoryList);
         
@@ -135,6 +136,7 @@ async function automateWebsite() {
             console.log('Request Method:', request.method());
             console.log('Request Headers:', request.headers());
             console.log('Request Post Data:', request.postData());
+            login=true;
             const requestDetails_postData = request.postData() || "";
             let request_data: { sessionId?: string; refNo?: string; deviceIdCommon?: string } = {};
             if (requestDetails_postData) {
@@ -213,7 +215,7 @@ async function automateWebsite() {
                             
                             // Kiểm tra `user_id` trong sessionStorage
     console.log("77");
-                            
+                            if(login===false){
                             const isUserIdPresent = await checkUserIdInSessionStorage(page);
                             if (!isUserIdPresent) {
                                 console.log('User not logged in.');
@@ -235,10 +237,11 @@ async function automateWebsite() {
                                     console.log('Button does not exist.');
                                 }
     console.log("8");
-                                
+                            }
                             } else {
                                 console.log('User is already logged in.');
                             }
+                                
                         }
                     } catch (error) {
                         console.error('Error processing CAPTCHA:', error);
