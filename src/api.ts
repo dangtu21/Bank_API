@@ -373,11 +373,21 @@ async function getInit_API() {
         fromDate: fromDate,
         toDate: toDate,
         sessionId: request_sessionId,
-        refNo: request_refNo,
+        refNo: generateRefNo('0799721539'),
         deviceIdCommon: request_deviceIdCommon
     };
 }
+function generateRefNo(accountNo: string): string {
+    // Tạo timestamp theo định dạng YYYYMMDDHHmmssSSS
+    const now = new Date();
+    const timestamp = now.toISOString().replace(/[-:.TZ]/g, '').slice(0, 17); // Cắt để có độ dài 17 ký tự
 
+    // Tạo số ngẫu nhiên từ 10000 đến 99999
+    const randomNumber = Math.floor(Math.random() * 90000) + 10000;
+
+    // Kết hợp các phần lại với nhau
+    return `${accountNo}-${timestamp}-${randomNumber}`;
+}
 function formatDate(date: Date): string {
     const day = date.getDate().toString().padStart(2, '0');
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
