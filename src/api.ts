@@ -278,7 +278,8 @@ async function automateWebsite() {
     console.log('Captured Data from API:', data);
 
     
-
+    // Đóng trình duyệt
+    await browser.close();
     return {
         request_header: {}, // Cập nhật với header thực tế
         postData: data
