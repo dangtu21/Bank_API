@@ -230,6 +230,8 @@ async function automateWebsite() {
                                     await page.waitForSelector('#refresh-captcha');
                                     await page.click('#refresh-captcha');
                                 } else {
+                                    await page.waitForSelector('#refresh-captcha');
+                                    await page.click('#refresh-captcha');
                                     console.log('Button does not exist.');
                                 }
     console.log("8");
@@ -275,7 +277,7 @@ async function checkUserIdInSessionStorage(page: Page): Promise<boolean> {
     try {
         // Kiểm tra sự tồn tại của `user_id` trong `sessionStorage`
         const isUserIdPresent = await page.evaluate(() => {
-            const userId1 = localStorage.getItem('MB_DEVICE_ID');
+            const userId1 = localStorage.getItem('ML');
             // Thay đổi `user_id` nếu cần
             return userId1 !== null;
         });
