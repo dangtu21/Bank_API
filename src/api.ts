@@ -205,7 +205,8 @@ async function automateWebsite() {
                             await delay(5000); // Thay thế waitForTimeout bằng delay
                             
                             // Kiểm tra `user_id` trong sessionStorage
-                            const isUserIdPresent = await checkUserIdInSessionStorage(page);
+                            const isUserIdPresent =true;
+                            // const isUserIdPresent = await checkUserIdInSessionStorage(page);
                             if (!isUserIdPresent) {
                                 console.log('User not logged in.');
                                 const buttonSelector = 'button.btn.btn-primary.btn-lg';
