@@ -107,7 +107,7 @@ async function gettransactionHistoryList(){
     if (!automateWebsitePromise) {
         automateWebsitePromise = automateWebsite();
     }
-    console.log('automateWebsitePromise:');
+    console.log('automateWebsitePromise:',automateWebsitePromise);
     const sessionData = await automateWebsitePromise;
     console.log('Session Data:', sessionData);
     request_header=sessionData.request_header;
