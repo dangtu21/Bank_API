@@ -54,7 +54,6 @@ app.get('/getTransaction', async (req: Request, res: Response) => {
             if(transactionHistoryList===null){
                 console.log("transactionHistoryList");
                 res.json({status:"lỗi"});
-               
                 return; 
             }
             console.log("xxxxx",transactionHistoryList);
@@ -108,6 +107,7 @@ async function gettransactionHistoryList(){
     if (!automateWebsitePromise) {
         automateWebsitePromise = automateWebsite();
     }
+    console.log('automateWebsitePromise:');
     const sessionData = await automateWebsitePromise;
     console.log('Session Data:', sessionData);
     request_header=sessionData.request_header;
