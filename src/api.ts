@@ -13,7 +13,7 @@ console.log("1");
 
 console.log("2");
 const timezone = 'Asia/Ho_Chi_Minh'; 
-let isResponseSent = false;
+
 const port = 3000;
 let request_header: AxiosRequestConfig<any> | undefined;
 let request_url: string;
@@ -22,7 +22,7 @@ let request_refNo: string;
 let request_deviceIdCommon: string;
 let request_cookie: string;
 let postData: any;
-let login=false;
+
 request_sessionId = "66e1cf0d-44a6-47be-9a21-f3fe100677a4";
 request_refNo = "0799721539-2024090411010830-29297";
 request_deviceIdCommon = "5utohm74-mbib-0000-0000-2024090411005560";
@@ -32,37 +32,15 @@ app.use(express.json());
 console.log("3");
 let automateWebsitePromise: Promise<{ request_header: AxiosRequestConfig<any>, postData: any }> | undefined;
 let getCapcha: Promise<{ request_header: AxiosRequestConfig<any>, postData: any }> | undefined;
-async function gettransactionHistoryList(){
-    if (!automateWebsitePromise) {
-        automateWebsitePromise = automateWebsite();
-    }
-    const sessionData = await automateWebsitePromise;
-    console.log('Session Data:', sessionData);
 
-    // Cập nhật các biến sessionId và deviceIdCommon nếu có giá trị mới
-    request_sessionId = sessionData.postData.sessionId || request_sessionId;
-    request_deviceIdCommon = sessionData.postData.deviceIdCommon || request_deviceIdCommon;
-    console.log('request_sessionId:', request_sessionId);
-    console.log('request_deviceIdCommon:', request_deviceIdCommon);
-
-    await getInit_API();
-    try{
-        const response = await axios.post(request_url, postData, request_header);
-        const { result, transactionHistoryList } = response.data;
-        isResponseSent = true;
-        return transactionHistoryList;
-    }catch(err){
-        console.error("Lỗi :",err);
-        return null;
-    }
-    
-}
 app.get('/getTransaction', async (req: Request, res: Response) => {
+    
     // Chờ hàm getInit_API hoàn tất
     await getInit_API();
     console.log("1");
     try {
         // Thực hiện gọi API chính
+
         let response = await axios.post(request_url, postData, request_header);
         let { result, transactionHistoryList } = response.data;
         console.log("2");
@@ -74,37 +52,28 @@ app.get('/getTransaction', async (req: Request, res: Response) => {
             let transactionHistoryList= await gettransactionHistoryList();
             console.log(transactionHistoryList);
             if(transactionHistoryList===null){
-                
                 console.log("transactionHistoryList");
                 res.json({status:"lỗi"});
-                isResponseSent = true;
+               
                 return; 
-            }else
-            if (isResponseSent==false) {
-                console.log(" chưa trả về  ");
-
-                res.json(transactionHistoryList);
-                isResponseSent = true;
-                return; // Ngăn không cho gửi phản hồi thêm lần nữa
-            }else{
-                console.log("không rõ ");
-                res.json(transactionHistoryList);
-                isResponseSent = true;
             }
-        }
-    
-        // Nếu không có lỗi, trả về danh sách lịch sử giao dịch
-        if (!isResponseSent) {
+
             res.json(transactionHistoryList);
-            isResponseSent = true;
+ 
+            return; // Ngăn không cho gửi phản hồi thêm lần nữa
+            
         }
     
+       
+        res.json(transactionHistoryList);
+        return;
+            
     } catch (error) {
         // Xử lý lỗi khi gọi API và cố gắng khôi phục
         console.error('Error calling API:', error);
     
         try {
-            if (!isResponseSent) {
+          
                 console.log('2Session Invalid. Retrying...');
                 let transactionHistoryList= await gettransactionHistoryList();
                 // Nếu không có lỗi, trả về danh sách lịch sử giao dịch
@@ -112,36 +81,57 @@ app.get('/getTransaction', async (req: Request, res: Response) => {
                 
                     console.log("transactionHistoryList");
                     res.json({status:"lỗi"});
-                    isResponseSent = true;
                     return; 
-                }else
-                if (isResponseSent==false) {
+                }
+                
                     console.log(" chưa trả về  ");
     
                     res.json(transactionHistoryList);
-                    isResponseSent = true;
                     return; // Ngăn không cho gửi phản hồi thêm lần nữa
-                }else{
-                    console.log("không rõ ");
-                    res.json(transactionHistoryList);
-                    isResponseSent = true;
-                }
+              
+                    
                 
-            }
+                
+            
     
         } catch (error) {
             console.error('Error calling API during retry:', error);
-            if (!isResponseSent) {
+           
                 res.status(500).json({ error: 'Internal Server Error' });
-                isResponseSent = true;
-            }
+                return;
+            
         }
     }
 
 });
-console.log("4");
+async function gettransactionHistoryList(){
+    if (!automateWebsitePromise) {
+        automateWebsitePromise = automateWebsite();
+    }
+    const sessionData = await automateWebsitePromise;
+    console.log('Session Data:', sessionData);
+
+    // Cập nhật các biến sessionId và deviceIdCommon nếu có giá trị mới
+    request_sessionId = sessionData.postData.sessionId || null;
+    request_deviceIdCommon = sessionData.postData.deviceIdCommon || null;
+    console.log('request_sessionId:', request_sessionId);
+    console.log('request_deviceIdCommon:', request_deviceIdCommon);
+
+    await getInit_API();
+    try{
+        const response = await axios.post(request_url, postData, request_header);
+        const { result, transactionHistoryList } = response.data;
+        return transactionHistoryList;
+    }catch(err){
+        console.error("Lỗi :",err);
+        return null;
+    }
+    
+}
+
 
 async function automateWebsite() {
+    let login=false;
     const user_id = "0799721539";
     const password = "Tu211102!";
     let capcha: string | undefined;
@@ -166,6 +156,7 @@ async function automateWebsite() {
 
     page.on('request', async (request) => {
         if (request.url() === 'https://online.mbbank.com.vn/api/retail_web/loyalty/getBalanceLoyalty') {
+            login=true;
             console.log('Request URL:', request.url());
             console.log('Request Method:', request.method());
             console.log('Request Headers:', request.headers());
@@ -175,6 +166,7 @@ async function automateWebsite() {
             if (requestDetails_postData) {
                 try {
                     request_data = JSON.parse(requestDetails_postData);
+                    console.log("request_data",request_data);
                     // Hoàn thành promise khi API được gọi
                     if (resolveRequestData) {
                         resolveRequestData(request_data);
@@ -196,7 +188,7 @@ async function automateWebsite() {
                 const responseBody = await response.json();
                 capcha = responseBody.imageString || undefined;
                 if (capcha) {
-                    await LogIn(page, capcha, user_id, password);
+                    await LogIn(page, capcha, user_id, password,login);
                 } else {
                     console.error('CAPTCHA was not captured.');
                 }
@@ -223,7 +215,9 @@ async function automateWebsite() {
 console.log("5");
 
 // Tạo một hàm để đợi một khoảng thời gian
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+function delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 async function getCapCha(capcha:string): Promise<any>{
     try {
@@ -237,6 +231,7 @@ async function getCapCha(capcha:string): Promise<any>{
                 'User-Agent': 'Thunder Client (https://www.thunderclient.com)',
             }
         });
+        console.log(`data:image/png;base64,${capcha}`);
         return captchaResponse;
         
     } catch (error) {
@@ -244,7 +239,7 @@ async function getCapCha(capcha:string): Promise<any>{
         return null;
     }
 }
-async function LogIn(page: Page, capcha: string, user_id: string, password: string): Promise<boolean> {
+async function LogIn(page: Page, capcha: string, user_id: string, password: string,login:boolean): Promise<boolean> {
     try {
         await page.waitForSelector('#user-id');
         await page.evaluate(() => {
@@ -263,11 +258,12 @@ async function LogIn(page: Page, capcha: string, user_id: string, password: stri
             }
         });
         await page.type('#new-password', password);
-
+        console.log("ádfa");
         const captchaResponse = await getCapCha(capcha);
         if (captchaResponse === null) {
             return false;
         }
+        console.log("ádfa");
 
         console.log("6");
         if (captchaResponse != null) {
@@ -292,26 +288,29 @@ async function LogIn(page: Page, capcha: string, user_id: string, password: stri
                     console.log('Button is not visible or not interactable.');
                     return false;
                 }
-
+                delay(20000);
                 // Kiểm tra `user_id` trong sessionStorage
                 console.log("77");
-                if (!await checkUserIdInSessionStorage(page)) {
-                    console.log('User not logged in.');
-                    const buttonSelector = 'button.btn.btn-primary.btn-lg';
-                    const buttonExists = await page.evaluate((selector) => {
-                        const button = document.querySelector(selector);
-                        return button !== null;
-                    }, buttonSelector);
+                if(login==false){
+                    
+                        console.log('User not logged in.');
+                        const buttonSelector = 'button.btn.btn-primary.btn-lg';
+                        const buttonExists = await page.evaluate((selector) => {
+                            const button = document.querySelector(selector);
+                            return button !== null;
+                        }, buttonSelector);
 
-                    if (buttonExists) {
-                        console.log('Button exists. Clicking on the button...');
-                        await page.click(buttonSelector);
-                        console.log('Button clicked.');
-                    }
-                    await page.waitForSelector('#refresh-captcha');
-                    await page.click('#refresh-captcha');
-                    console.log('Refreshing CAPTCHA.');
-                    return false;
+                        if (buttonExists) {
+                            console.log('Button exists. Clicking on the button...');
+                            await page.click(buttonSelector);
+                            console.log('Button clicked.');
+                        }
+                        await page.waitForSelector('#refresh-captcha');
+                        await page.click('#refresh-captcha');
+                        console.log('Refreshing CAPTCHA.');
+                        return false;
+                    
+                
                 } else {
                     console.log('User is already logged in.');
                     return true;
@@ -326,24 +325,26 @@ async function LogIn(page: Page, capcha: string, user_id: string, password: stri
     }
 }
 
-async function checkUserIdInSessionStorage(page: Page): Promise<boolean> {
+
+
+async function checkUserIdInLocalStorage(page: Page): Promise<boolean> {
     try {
-        // Kiểm tra sự tồn tại của `user_id` trong `sessionStorage`
-        const isUserIdPresent = await page.evaluate(() => {
-            const userId1 = localStorage.getItem('ML');
-            // Thay đổi `user_id` nếu cần
-            return userId1 !== null;
+        const localStorageContents = await page.evaluate(() => {
+            const storage: { [key: string]: string } = {};
+            Object.keys(localStorage).forEach(key => {
+                storage[key] = localStorage.getItem(key) || '';
+            });
+            return storage;
         });
-
-        
-
-
-        return isUserIdPresent;
+        console.log('LocalStorage contents:', localStorageContents);
+        return true;
     } catch (error) {
-        console.error('Error checking user_id in sessionStorage:', error);
-        return false;
+        console.error('Error checking localStorage contents:', error);
+        return true;
+
     }
 }
+
 async function getInit_API() {
     request_header = {
         headers: {
