@@ -9,9 +9,7 @@ const app = express();
 app.use(cors({
     origin: '*' // Cho phép tất cả các nguồn
 }));
-console.log("1");
 
-console.log("2");
 const timezone = 'Asia/Ho_Chi_Minh'; 
 
 const port = 3000;
@@ -40,6 +38,7 @@ app.get('/getTransaction', async (req: Request, res: Response) => {
     console.log("1");
     try {
         // Thực hiện gọi API chính
+    console.log("ssss");
 
         let response = await axios.post(request_url, postData, request_header);
         let { result, transactionHistoryList } = response.data;
