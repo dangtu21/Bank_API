@@ -203,7 +203,7 @@ async function automateWebsite() {
         }
     });
 
-    await page.goto('https://online.mbbank.com.vn',{ timeout: 60000 });
+    await page.goto('https://online.mbbank.com.vn/pl/login?returnUrl=%2F',{ timeout: 60000 });
 
     // Đợi cho đến khi API được gọi
     const data = await getBalanceLoyaltyPromise;
