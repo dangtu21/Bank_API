@@ -110,7 +110,7 @@ async function gettransactionHistoryList(){
     }
     const sessionData = await automateWebsitePromise;
     console.log('Session Data:', sessionData);
-
+    request_header=sessionData.request_header;
     // Cập nhật các biến sessionId và deviceIdCommon nếu có giá trị mới
     request_sessionId = sessionData.postData.sessionId || null;
     request_deviceIdCommon = sessionData.postData.deviceIdCommon || null;
@@ -153,7 +153,7 @@ async function automateWebsite() {
     });
 
     console.log("66");
-
+    let capturedRequestHeaders: AxiosRequestConfig<any>;
     page.on('request', async (request) => {
         if (request.url() === 'https://online.mbbank.com.vn/api/retail_web/loyalty/getBalanceLoyalty') {
             login=true;
@@ -162,6 +162,8 @@ async function automateWebsite() {
             console.log('Request Headers:', request.headers());
             console.log('Request Post Data:', request.postData());
             const requestDetails_postData = request.postData() || "";
+            // Lưu header của request
+            capturedRequestHeaders = request.headers();
             let request_data: { sessionId?: string; refNo?: string; deviceIdCommon?: string } = {};
             if (requestDetails_postData) {
                 try {
