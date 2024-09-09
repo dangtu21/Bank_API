@@ -9,7 +9,9 @@ const app = express();
 app.use(cors({
     origin: '*' // Cho phép tất cả các nguồn
 }));
+console.log("1");
 
+console.log("2");
 const timezone = 'Asia/Ho_Chi_Minh'; 
 
 const port = 3000;
@@ -38,7 +40,6 @@ app.get('/getTransaction', async (req: Request, res: Response) => {
     console.log("1");
     try {
         // Thực hiện gọi API chính
-    console.log("ssss");
 
         let response = await axios.post(request_url, postData, request_header);
         let { result, transactionHistoryList } = response.data;
@@ -56,6 +57,7 @@ app.get('/getTransaction', async (req: Request, res: Response) => {
                
                 return; 
             }
+            console.log("xxxxx",transactionHistoryList);
 
             res.json(transactionHistoryList);
  
@@ -77,13 +79,12 @@ app.get('/getTransaction', async (req: Request, res: Response) => {
                 let transactionHistoryList= await gettransactionHistoryList();
                 // Nếu không có lỗi, trả về danh sách lịch sử giao dịch
                 if(transactionHistoryList===null){
-                
                     console.log("transactionHistoryList");
                     res.json({status:"lỗi"});
                     return; 
                 }
                 
-                    console.log(" chưa trả về  ");
+                    console.log(" chưa trả về  ",transactionHistoryList);
     
                     res.json(transactionHistoryList);
                     return; // Ngăn không cho gửi phản hồi thêm lần nữa
@@ -363,7 +364,8 @@ async function getInit_API() {
             'sec-ch-ua-platform': '"Windows"',
             'cookie': request_cookie,
             'origin': 'https://online.mbbank.com.vn'
-        }
+        },
+        timeout: 5000
     };
     
     
