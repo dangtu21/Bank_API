@@ -365,7 +365,7 @@ async function getInit_API() {
             'cookie': request_cookie,
             'origin': 'https://online.mbbank.com.vn'
         },
-        timeout: 5000
+        timeout: 10000
     };
     
     
