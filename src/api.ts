@@ -117,8 +117,6 @@ async function gettransactionHistoryList(){
     request_deviceIdCommon = sessionData.postData.deviceIdCommon || null;
     console.log('request_sessionId:', request_sessionId);
     console.log('request_deviceIdCommon:', request_deviceIdCommon);
-
-    await getInit_API();
     try{
         const response = await axios.post(request_url, postData, request_header);
         const { result, transactionHistoryList } = response.data;
@@ -203,7 +201,7 @@ async function automateWebsite() {
         }
     });
 
-    await page.goto('https://online.mbbank.com.vn/pl/login?returnUrl=%2F',{ timeout: 60000 });
+    await page.goto('https://online.mbbank.com.vn',{ timeout: 60000 });
 
     // Đợi cho đến khi API được gọi
     const data = await getBalanceLoyaltyPromise;
