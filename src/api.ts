@@ -107,8 +107,9 @@ async function gettransactionHistoryList(){
     if (!automateWebsitePromise) {
         automateWebsitePromise = automateWebsite();
     }
-    console.log('automateWebsitePromise:',automateWebsitePromise);
+    
     const sessionData = await automateWebsitePromise;
+    console.log('automateWebsitePromise:',automateWebsitePromise);
     console.log('Session Data:', sessionData);
     request_header=sessionData.request_header;
     // Cập nhật các biến sessionId và deviceIdCommon nếu có giá trị mới
@@ -202,7 +203,7 @@ async function automateWebsite() {
         }
     });
 
-    await page.goto('https://online.mbbank.com.vn');
+    await page.goto('https://online.mbbank.com.vn',{ timeout: 60000 });
 
     // Đợi cho đến khi API được gọi
     const data = await getBalanceLoyaltyPromise;
